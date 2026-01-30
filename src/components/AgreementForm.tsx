@@ -24,6 +24,7 @@ const AgreementForm = () => {
     sublessorName: 'Vineet Dutta',
     propertyAddress: '',
     rent: '',
+    proRateRent: '',
     securityDeposit: '',
     leaseStartDate: undefined as Date | undefined,
     leaseEndDate: undefined as Date | undefined,
@@ -69,6 +70,7 @@ const AgreementForm = () => {
         sublessorName: formData.sublessorName,
         propertyAddress: formData.propertyAddress,
         rent: formData.rent,
+        proRateRent: formData.proRateRent,
         securityDeposit: formData.securityDeposit,
         leaseStartDate: formData.leaseStartDate!.toISOString(),
         leaseEndDate: formData.leaseEndDate!.toISOString(),
@@ -150,8 +152,8 @@ const AgreementForm = () => {
           />
         </div>
 
-        {/* Rent & Security Deposit */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Rent, Pro Rate & Security Deposit */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="rent" className="text-sm font-medium">
               Monthly Rent ($)
@@ -162,6 +164,19 @@ const AgreementForm = () => {
               placeholder="e.g., 1650"
               value={formData.rent}
               onChange={(e) => handleInputChange('rent', e.target.value)}
+              className="h-11"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="proRateRent" className="text-sm font-medium">
+              Pro Rate Rent ($)
+            </Label>
+            <Input
+              id="proRateRent"
+              type="number"
+              placeholder="Optional"
+              value={formData.proRateRent}
+              onChange={(e) => handleInputChange('proRateRent', e.target.value)}
               className="h-11"
             />
           </div>

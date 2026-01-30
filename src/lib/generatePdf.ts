@@ -6,6 +6,7 @@ export interface AgreementData {
   sublessorName: string;
   propertyAddress: string;
   rent: string;
+  proRateRent?: string;
   securityDeposit: string;
   leaseStartDate: string;
   leaseEndDate: string;
@@ -151,13 +152,24 @@ export const generateAgreementPdf = async (
   pdf.setFontSize(10);
   pdf.text(`1. Rent: $${data.rent}`, margin + 4, yPos);
   yPos += 5;
-  pdf.text(`2. Security Deposit: $${data.securityDeposit}`, margin + 4, yPos);
-  yPos += 7;
+  
+  // Pro Rate Rent (only if provided)
+  let clauseNumber = 2;
+  if (data.proRateRent && data.proRateRent.trim() !== '') {
+    pdf.text(`${clauseNumber}. Pro Rate Rent: $${data.proRateRent}`, margin + 4, yPos);
+    yPos += 5;
+    clauseNumber++;
+  }
+  
+  pdf.text(`${clauseNumber}. Security Deposit: $${data.securityDeposit}`, margin + 4, yPos);
+  yPos += 8;
 
   // The parties agree
   pdf.text('The parties agree:', margin, yPos);
-  yPos += 6;
+  yPos += 7;
 
+  const startClauseNum = clauseNumber + 1;
+  
   const clauses = [
     `If the monthly electric bill exceeds $200, the amount over $200 will be divided equally among three occupants, with ${data.tenantName} responsible for his/her share of the excess charge.`,
     `Rent will be paid on the first of the month, if payment is not received by the 3rd of the month a $50 late fee will be applied.`,
@@ -183,25 +195,25 @@ export const generateAgreementPdf = async (
 
   // First 3 clauses
   for (let i = 0; i < clauses.length; i++) {
-    const clauseText = `${i + 1}. ${clauses[i]}`;
+    const clauseText = `${startClauseNum + i}. ${clauses[i]}`;
     yPos = writeTextWithBoldNames(pdf, clauseText, margin + 4, yPos, contentWidth - 8, data.tenantName, data.sublessorName);
-    yPos += 1;
+    yPos += 2.5;
 
     // Add sub-clauses after clause 3
     if (i === 2) {
       for (let j = 0; j < subClauses.length; j++) {
         const subClauseText = `${String.fromCharCode(97 + j)}. ${subClauses[j]}`;
         yPos = writeTextWithBoldNames(pdf, subClauseText, margin + 12, yPos, contentWidth - 16, data.tenantName, data.sublessorName);
-        yPos += 0.5;
+        yPos += 1.5;
       }
     }
   }
 
-  // Remaining clauses (4-11)
+  // Remaining clauses
   for (let i = 0; i < remainingClauses.length; i++) {
-    const clauseText = `${i + 4}. ${remainingClauses[i]}`;
+    const clauseText = `${startClauseNum + 3 + i}. ${remainingClauses[i]}`;
     yPos = writeTextWithBoldNames(pdf, clauseText, margin + 4, yPos, contentWidth - 8, data.tenantName, data.sublessorName);
-    yPos += 1;
+    yPos += 2.5;
   }
 
   // Signature section
