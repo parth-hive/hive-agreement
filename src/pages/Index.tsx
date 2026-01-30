@@ -10,7 +10,7 @@ const Index = () => {
           <img 
             src={hiveLetterhead} 
             alt="Hive New York Living" 
-            className="h-16 md:h-20 w-auto object-contain"
+            className="w-full max-w-2xl h-auto object-contain"
           />
         </div>
       </header>
