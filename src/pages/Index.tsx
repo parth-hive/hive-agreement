@@ -6,11 +6,11 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="container mx-auto px-4 py-4">
           <img 
             src={hiveLetterhead} 
             alt="Hive New York Living" 
-            className="h-10 w-auto object-contain"
+            className="h-16 md:h-20 w-auto object-contain"
           />
         </div>
       </header>
