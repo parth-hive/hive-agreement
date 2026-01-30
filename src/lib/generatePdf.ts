@@ -156,7 +156,7 @@ export const generateAgreementPdf = async (
   // Pro Rate Rent (only if provided)
   let clauseNumber = 2;
   if (data.proRateRent && data.proRateRent.trim() !== '') {
-    pdf.text(`${clauseNumber}. Pro Rate Rent: $${data.proRateRent}`, margin + 4, yPos);
+    pdf.text(`${clauseNumber}. Prorated Rent: $${data.proRateRent}`, margin + 4, yPos);
     yPos += 5;
     clauseNumber++;
   }

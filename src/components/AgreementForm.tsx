@@ -169,7 +169,7 @@ const AgreementForm = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="proRateRent" className="text-sm font-medium">
-              Pro Rate Rent ($)
+              Prorated Rent ($)
             </Label>
             <Input
               id="proRateRent"
