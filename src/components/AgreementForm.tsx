@@ -118,7 +118,7 @@ const AgreementForm = () => {
             </Label>
             <Input
               id="tenantName"
-              placeholder="e.g., Praveen Kumar Anwla"
+              placeholder="e.g., Lex Luthor"
               value={formData.tenantName}
               onChange={(e) => handleInputChange('tenantName', e.target.value)}
               className="h-11"
