@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import hiveLetterhead from '@/assets/hive-letterhead.png';
+import hiveLogo from '@/assets/hive-logo.png';
 
 export interface AgreementData {
   tenantName: string;
@@ -91,16 +91,31 @@ export const generateAgreementPdf = async (
   // Add letterhead if requested
   if (includeLetterhead) {
     const img = new Image();
-    img.src = hiveLetterhead;
+    img.src = hiveLogo;
     
     await new Promise((resolve) => {
       img.onload = resolve;
     });
     
-    const imgWidth = 145;
+    const imgWidth = 55;
     const imgHeight = (img.height / img.width) * imgWidth;
     pdf.addImage(img, 'PNG', margin, yPos, imgWidth, imgHeight);
-    yPos += imgHeight + 2;
+    
+    // Contact details on top right
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    const rightX = pageWidth - margin;
+    let contactY = yPos + 6;
+    
+    pdf.text('917-622-9847', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('Vineet.Dutta@HiveNY.com', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('442 5th Avenue Suite #2478', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('New York, NY 10018', rightX, contactY, { align: 'right' });
+    
+    yPos += imgHeight + 1;
     
     // Yellow divider line
     pdf.setDrawColor(255, 204, 0);
@@ -115,42 +130,41 @@ export const generateAgreementPdf = async (
   pdf.text('Sublease Agreement', pageWidth / 2, yPos, { align: 'center' });
   yPos += hasLetterhead ? 7 : 9;
 
-  // Introduction paragraph with bold names
+  // Introduction paragraph with bold names and address
   pdf.setFontSize(10);
-  const introStart = `This agreement is made between `;
-  const introMid = ` and `;
-  const introEnd = ` for the period beginning ${formatDate(data.leaseStartDate)}, and ending ${formatDate(data.leaseEndDate)}, and will convert to a month-to-month at ${data.propertyAddress}.`;
+  const lineHeight = 4.2;
   
-  let currentX = margin;
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(introStart, currentX, yPos);
-  currentX += pdf.getTextWidth(introStart);
+  // Build the full intro text for proper word wrapping
+  const fullIntroText = `This agreement is made between ${data.tenantName} and ${data.sublessorName} for the period beginning ${formatDate(data.leaseStartDate)}, and ending ${formatDate(data.leaseEndDate)}, and will convert to a month-to-month at ${data.propertyAddress}.`;
   
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(data.tenantName, currentX, yPos);
-  currentX += pdf.getTextWidth(data.tenantName);
+  const introLines = pdf.splitTextToSize(fullIntroText, contentWidth);
   
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(introMid, currentX, yPos);
-  currentX += pdf.getTextWidth(introMid);
-  
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(data.sublessorName, currentX, yPos);
-  currentX += pdf.getTextWidth(data.sublessorName);
-  
-  pdf.setFont('helvetica', 'normal');
-  const introLines = pdf.splitTextToSize(introEnd, pageWidth - currentX - margin);
-  if (introLines.length > 0) {
-    pdf.text(introLines[0], currentX, yPos);
-  }
-  yPos += 4.2;
-  
-  if (introLines.length > 1) {
-    for (let i = 1; i < introLines.length; i++) {
-      pdf.text(introLines[i], margin, yPos);
-      yPos += 4.2;
+  for (const line of introLines) {
+    let currentX = margin;
+    const words = line.split(' ');
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const isLastWord = i === words.length - 1;
+      
+      // Check if word is part of tenant name, sublessor name, or address
+      const isTenantName = data.tenantName.split(' ').some(part => word.includes(part) && part.length > 2);
+      const isSublessorName = data.sublessorName.split(' ').some(part => word.includes(part) && part.length > 2);
+      const isAddress = data.propertyAddress.split(' ').some(part => word.includes(part) && part.length > 2);
+      
+      if (isTenantName || isSublessorName || isAddress) {
+        pdf.setFont('helvetica', 'bold');
+      } else {
+        pdf.setFont('helvetica', 'normal');
+      }
+      
+      pdf.text(word + (isLastWord ? '' : ' '), currentX, yPos);
+      currentX += pdf.getTextWidth(word + ' ');
     }
+    yPos += lineHeight;
   }
+  
+  pdf.setFont('helvetica', 'normal');
   yPos += 4;
 
   // Rent and Security Deposit
@@ -167,13 +181,13 @@ export const generateAgreementPdf = async (
   }
   
   pdf.text(`${clauseNumber}. Security Deposit: $${data.securityDeposit}`, margin + 4, yPos);
-  yPos += sectionSpacing;
+  yPos += sectionSpacing + (hasLetterhead ? 4 : 0);
 
   // The parties agree
   pdf.text('The parties agree:', margin, yPos);
   yPos += hasLetterhead ? 5 : 7;
 
-  const startClauseNum = clauseNumber + 1;
+  const startClauseNum = 1;
   
   const clauses = [
     `If the monthly electric bill exceeds $200, the amount over $200 will be divided equally among three occupants, with ${data.tenantName} responsible for his/her share of the excess charge.`,
