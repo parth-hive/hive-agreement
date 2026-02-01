@@ -97,9 +97,24 @@ export const generateAgreementPdf = async (
       img.onload = resolve;
     });
     
-    const imgWidth = 45;
+    const imgWidth = 55;
     const imgHeight = (img.height / img.width) * imgWidth;
     pdf.addImage(img, 'PNG', margin, yPos, imgWidth, imgHeight);
+    
+    // Contact details on top right
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    const rightX = pageWidth - margin;
+    let contactY = yPos + 2;
+    
+    pdf.text('917-622-9847', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('Vineet.Dutta@HiveNY.com', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('442 5th Avenue Suite #2478', rightX, contactY, { align: 'right' });
+    contactY += 4;
+    pdf.text('New York, NY 10018', rightX, contactY, { align: 'right' });
+    
     yPos += imgHeight + 1;
     
     // Yellow divider line
