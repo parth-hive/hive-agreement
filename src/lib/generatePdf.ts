@@ -115,42 +115,41 @@ export const generateAgreementPdf = async (
   pdf.text('Sublease Agreement', pageWidth / 2, yPos, { align: 'center' });
   yPos += hasLetterhead ? 7 : 9;
 
-  // Introduction paragraph with bold names
+  // Introduction paragraph with bold names and address
   pdf.setFontSize(10);
-  const introStart = `This agreement is made between `;
-  const introMid = ` and `;
-  const introEnd = ` for the period beginning ${formatDate(data.leaseStartDate)}, and ending ${formatDate(data.leaseEndDate)}, and will convert to a month-to-month at ${data.propertyAddress}.`;
+  const lineHeight = 4.2;
   
-  let currentX = margin;
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(introStart, currentX, yPos);
-  currentX += pdf.getTextWidth(introStart);
+  // Build the full intro text for proper word wrapping
+  const fullIntroText = `This agreement is made between ${data.tenantName} and ${data.sublessorName} for the period beginning ${formatDate(data.leaseStartDate)}, and ending ${formatDate(data.leaseEndDate)}, and will convert to a month-to-month at ${data.propertyAddress}.`;
   
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(data.tenantName, currentX, yPos);
-  currentX += pdf.getTextWidth(data.tenantName);
+  const introLines = pdf.splitTextToSize(fullIntroText, contentWidth);
   
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(introMid, currentX, yPos);
-  currentX += pdf.getTextWidth(introMid);
-  
-  pdf.setFont('helvetica', 'bold');
-  pdf.text(data.sublessorName, currentX, yPos);
-  currentX += pdf.getTextWidth(data.sublessorName);
-  
-  pdf.setFont('helvetica', 'normal');
-  const introLines = pdf.splitTextToSize(introEnd, pageWidth - currentX - margin);
-  if (introLines.length > 0) {
-    pdf.text(introLines[0], currentX, yPos);
-  }
-  yPos += 4.2;
-  
-  if (introLines.length > 1) {
-    for (let i = 1; i < introLines.length; i++) {
-      pdf.text(introLines[i], margin, yPos);
-      yPos += 4.2;
+  for (const line of introLines) {
+    let currentX = margin;
+    const words = line.split(' ');
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const isLastWord = i === words.length - 1;
+      
+      // Check if word is part of tenant name, sublessor name, or address
+      const isTenantName = data.tenantName.split(' ').some(part => word.includes(part) && part.length > 2);
+      const isSublessorName = data.sublessorName.split(' ').some(part => word.includes(part) && part.length > 2);
+      const isAddress = data.propertyAddress.split(' ').some(part => word.includes(part) && part.length > 2);
+      
+      if (isTenantName || isSublessorName || isAddress) {
+        pdf.setFont('helvetica', 'bold');
+      } else {
+        pdf.setFont('helvetica', 'normal');
+      }
+      
+      pdf.text(word + (isLastWord ? '' : ' '), currentX, yPos);
+      currentX += pdf.getTextWidth(word + ' ');
     }
+    yPos += lineHeight;
   }
+  
+  pdf.setFont('helvetica', 'normal');
   yPos += 4;
 
   // Rent and Security Deposit
