@@ -105,7 +105,7 @@ export const generateAgreementPdf = async (
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'normal');
     const rightX = pageWidth - margin;
-    let contactY = yPos + 2;
+    let contactY = yPos + 6;
     
     pdf.text('917-622-9847', rightX, contactY, { align: 'right' });
     contactY += 4;
