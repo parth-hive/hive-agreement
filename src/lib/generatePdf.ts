@@ -187,7 +187,7 @@ export const generateAgreementPdf = async (
   pdf.text('The parties agree:', margin, yPos);
   yPos += hasLetterhead ? 5 : 7;
 
-  const startClauseNum = clauseNumber + 1;
+  const startClauseNum = 1;
   
   const clauses = [
     `If the monthly electric bill exceeds $200, the amount over $200 will be divided equally among three occupants, with ${data.tenantName} responsible for his/her share of the excess charge.`,
