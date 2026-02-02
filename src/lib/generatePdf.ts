@@ -126,9 +126,15 @@ export const generateAgreementPdf = async (
 
   // Title
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(16);
-  pdf.text('Sublease Agreement', pageWidth / 2, yPos, { align: 'center' });
-  yPos += hasLetterhead ? 7 : 9;
+  pdf.setFontSize(14);
+  const titleText = 'SUBLEASE AGREEMENT';
+  pdf.text(titleText, pageWidth / 2, yPos, { align: 'center' });
+  // Underline
+  const titleWidth = pdf.getTextWidth(titleText);
+  pdf.setLineWidth(0.4);
+  pdf.setDrawColor(0, 0, 0);
+  pdf.line(pageWidth / 2 - titleWidth / 2, yPos + 1, pageWidth / 2 + titleWidth / 2, yPos + 1);
+  yPos += hasLetterhead ? 8 : 10;
 
   // Introduction paragraph with bold names and address
   pdf.setFontSize(10);
@@ -185,7 +191,7 @@ export const generateAgreementPdf = async (
 
   // The parties agree
   pdf.text('The parties agree:', margin, yPos);
-  yPos += hasLetterhead ? 5 : 7;
+  yPos += hasLetterhead ? 9 : 11; // spacing after
 
   const startClauseNum = 1;
   
